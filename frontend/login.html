@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — Онбординг</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f0fa 100%);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 40px -10px rgba(0, 100, 200, 0.2),
+                0 0 0 1px rgba(0, 120, 255, 0.1) inset;
+            width: 400px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container:hover {
+            box-shadow: 
+                0 30px 50px -15px rgba(0, 100, 255, 0.3),
+                0 0 0 2px rgba(0, 150, 255, 0.2) inset;
+        }
+
+        h1 {
+            color: #1a365d;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        h3 {
+            color: #2c5282;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        #user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .user-item {
+            background: white;
+            padding: 16px 20px;
+            border: 1px solid rgba(0, 120, 255, 0.1);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease-out;
+            animation-fill-mode: both;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .user-item:nth-child(1) { animation-delay: 0.1s; }
+        .user-item:nth-child(2) { animation-delay: 0.2s; }
+        .user-item:nth-child(3) { animation-delay: 0.3s; }
+        .user-item:nth-child(4) { animation-delay: 0.4s; }
+        .user-item:nth-child(5) { animation-delay: 0.5s; }
+
+        .user-item:hover {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e1efff 100%);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -8px rgba(0, 100, 255, 0.3);
+        }
+
+        .user-item strong {
+            color: #1e293b;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-item small {
+            color: #64748b;
+            font-size: 13px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        #login-form {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        #selected-user-name {
+            color: #0f172a;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .password-wrapper {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        input[type="password"], 
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            padding-right: 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: white;
+            color: #0f172a;
+        }
+
+        input[type="password"]:focus, 
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        input[type="password"]::placeholder,
+        input[type="text"]::placeholder {
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+            color: #64748b;
+            transition: all 0.2s ease;
+            padding: 5px;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-password:hover {
+            background: #f1f5f9;
+            color: #2563eb;
+        }
+
+        button#submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        button#submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -8px rgba(37, 99, 235, 0.4);
+        }
+
+        button#submit-btn:active {
+            transform: translateY(0);
+        }
+
+        button#submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        button#submit-btn:active::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        #user-selection {
+            transition: opacity 0.3s ease;
+        }
+
+        /* Стили для загрузки и ошибок */
+        #user-list p {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+        }
+
+        #user-list p[style*="color:red"] {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        /* Анимация пульсации для загрузки */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #user-list:contains("Загрузка") {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Микро-анимации */
+        .user-item:active {
+            transform: scale(0.98);
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px white inset;
+            -webkit-text-fill-color: #0f172a;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Онбординг</h1>
+        <h3>Добро пожаловать в систему</h3>
+        
+        <div id="user-selection">
+            <div id="user-list">Загрузка...</div>
+        </div>
+
+        <div id="login-form">
+            <h3 id="selected-user-name">Вход</h3>
+            <div class="password-wrapper">
+                <input type="password" id="password-input" placeholder="Введите пароль (12345)">
+                <span class="toggle-password" id="toggle-btn">👁️</span>
+            </div>
+            <button id="submit-btn">Войти</button>
+        </div>
+    </div>
+
+    <script>
+        const savedUserId = localStorage.getItem('user_id');
+    const savedRole = localStorage.getItem('user_role');
+    if (savedUserId && savedRole) {
+        const target = savedRole === 'employee' ? '/my-onboarding.html' : '/onboarding-plans.html';
+        window.location.replace(target);
+    }
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted && !localStorage.getItem('user_id')) window.location.reload();
+    });
+
+        let selectedUserId = null;
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/users');
+                if (!res.ok) throw new Error(`Ошибка сервера: ${res.status}`);
+                
+                const users = await res.json();
+                const userListDiv = document.getElementById('user-list');
+
+                if (!users || users.length === 0) {
+                    userListDiv.innerHTML = '<p>Пользователи не найдены</p>';
+                    return;
+                }
+
+                userListDiv.innerHTML = users.map(u => `
+                    <div class="user-item" onclick='showLoginForm(${JSON.stringify(u)})'>
+                        <strong>${u.name}</strong>
+                        <small>${u.role}</small>
+                    </div>
+                `).join('');
+                
+            } catch (err) {
+                console.error("Ошибка при загрузке юзеров:", err);
+                document.getElementById('user-list').innerHTML = '<p style="color:red">Ошибка загрузки</p>';
+            }
+        }
+
+        function showLoginForm(user) {
+            selectedUserId = user.id;
+            
+            // Анимация скрытия списка
+            const userSelection = document.getElementById('user-selection');
+            userSelection.style.opacity = '0';
+            
+            setTimeout(() => {
+                userSelection.style.display = 'none';
+                const loginForm = document.getElementById('login-form');
+                loginForm.style.display = 'block';
+                
+                // Небольшая задержка перед появлением формы
+                setTimeout(() => {
+                    loginForm.style.opacity = '1';
+                }, 10);
+                
+                document.getElementById('selected-user-name').textContent = `Вход: ${user.name}`;
+            }, 200);
+        }
+
+        document.getElementById('toggle-btn').onclick = function() {
+            const input = document.getElementById('password-input');
+            
+            // Анимация смены иконки
+            this.style.transform = 'translateY(-50%) scale(0.8)';
+            setTimeout(() => {
+                this.style.transform = 'translateY(-50%) scale(1)';
+                
+                if (input.type === "password") {
+                    input.type = "text";
+                    this.textContent = "🙈";
+                } else {
+                    input.type = "password";
+                    this.textContent = "👁️";
+                }
+            }, 100);
+        };
+
+        document.getElementById('submit-btn').onclick = async () => {
+            const pass = document.getElementById('password-input').value;
+            const btn = document.getElementById('submit-btn');
+            
+            // Анимация загрузки
+            btn.textContent = 'Вход...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id: selectedUserId, password: pass })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    localStorage.setItem('user_id', data.user_id);
+                    localStorage.setItem('user_role', data.role);
+                    
+                    // Успешная анимация
+                    btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    btn.textContent = '✓ Успешно!';
+                    
+                    setTimeout(() => {
+                        if (data.role === 'employee') {
+                            window.location.href = '/my-onboarding.html';
+                        } else if (data.role === 'admin' || data.role === 'mentor') {
+                            window.location.href = '/onboarding-plans.html';
+                        } else {
+                            alert('Неизвестная роль пользователя');
+                        }
+                    }, 500);
+                    
+                } else {
+                    btn.textContent = 'Ошибка входа';
+                    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                    
+                    setTimeout(() => {
+                        btn.textContent = 'Войти';
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+                    }, 2000);
+                    
+                    alert('Неверный пароль!');
+                }
+            } catch (error) {
+                btn.textContent = 'Ошибка';
+                btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                
+                setTimeout(() => {
+                    btn.textContent = 'Войти';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+                }, 2000);
+            }
+        };
+
+        loadUsers();
+
+        // Добавляем поддержку Enter для отправки формы
+        document.getElementById('password-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('submit-btn').click();
+            }
+        });
+    </script>
+</body>
+</html>

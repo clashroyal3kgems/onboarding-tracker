@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Личный кабинет сотрудника: отслеживание прогресса онбординга.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Мой Прогресс | Onboarding Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #60a5fa;
+            --success: #10b981;
+            --success-dark: #059669;
+            --warning: #f59e0b;
+            --warning-dark: #d97706;
+            --bg-start: #f0f9ff;
+            --bg-end: #e6f0fa;
+            --text-primary: #1a365d;
+            --text-secondary: #2c5282;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Header styles */
+        #main-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+            padding: 16px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+            margin: -20px -20px 20px -20px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 40px -10px rgba(37, 99, 235, 0.2),
+                0 0 0 1px rgba(37, 99, 235, 0.1) inset;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container:hover {
+            box-shadow: 
+                0 30px 50px -15px rgba(37, 99, 235, 0.3),
+                0 0 0 2px rgba(37, 99, 235, 0.2) inset;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 16px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+            animation: expandWidth 0.5s ease-out;
+        }
+
+        @keyframes expandWidth {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+            to {
+                width: 80px;
+                opacity: 1;
+            }
+        }
+
+        /* Progress bar */
+        .progress-container {
+            margin: 32px 0;
+            animation: slideUp 0.5s ease-out 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bg {
+            width: 100%;
+            background: rgba(226, 232, 240, 0.5);
+            border-radius: 50px;
+            height: 16px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #34d399);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-top: 12px;
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        #percent-text {
+            background: rgba(37, 99, 235, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: var(--primary);
+        }
+
+        /* Task list */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 32px;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+            animation: slideIn 0.3s ease-out;
+            animation-fill-mode: both;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        li:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+
+        li.status-in_progress {
+            border-left: 6px solid var(--warning);
+            background: linear-gradient(to right, rgba(245, 158, 11, 0.05), transparent);
+        }
+
+        li.status-done {
+            border-left: 6px solid var(--success);
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.05), transparent);
+        }
+
+        li.status-done span {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="checkbox"]:hover {
+            transform: scale(1.1);
+        }
+
+        input[type="checkbox"]:checked {
+            animation: pulse 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        li span {
+            flex-grow: 1;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .badge-todo {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            color: #475569;
+        }
+
+        .badge-progress {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .badge-done {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+        }
+
+        /* Complete section */
+        #complete-section {
+            display: none;
+            margin-top: 40px;
+            padding: 32px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(96, 165, 250, 0.1));
+            border: 2px dashed var(--primary);
+            border-radius: 20px;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        #complete-section h3 {
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        #complete-section p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        #finish-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px -8px var(--primary);
+        }
+
+        #finish-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -8px var(--primary-dark);
+        }
+
+        #finish-btn:active {
+            transform: translateY(0);
+        }
+
+        #finish-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        #finish-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .empty-state h2 {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        /* Loading animation */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            #main-header {
+                margin: -10px -10px 20px -10px;
+            }
+
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            li {
+                padding: 16px;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .badge {
+                margin-left: 36px;
+            }
+
+            #finish-btn {
+                width: 100%;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 5px;
+            transition: background 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-header"></div>
+    <script src="/header.js"></script>
+
+    <div class="container">
+        <h1>Твой путь в компании 🚀</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bg">
+                <div id="progress-bar" class="progress-fill"></div>
+            </div>
+            <div class="progress-stats">
+                <span>Прогресс обучения</span>
+                <span id="percent-text">0%</span>
+            </div>
+        </div>
+
+        <ul id="task-list">
+            <!-- Задачи будут загружаться сюда -->
+        </ul>
+
+        <div id="complete-section">
+            <h3>🎉 Отличная работа!</h3>
+            <p>Все материалы изучены. Нажми кнопку, чтобы завершить свой онбординг.</p>
+            <button id="finish-btn">Завершить обучение</button>
+        </div>
+    </div>
+
+    <script>
+        const userId = localStorage.getItem('user_id');
+        const userRole = localStorage.getItem('user_role');
+        let currentPlanId = null;
+
+        async function loadMyPlan() {
+            const taskList = document.getElementById('task-list');
+            
+            if (!userId) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                // Показываем загрузку
+                taskList.innerHTML = '<div class="loading">Загрузка вашего плана</div>';
+
+                const res = await fetch(`/api/my-plan?userId=${userId}`);
+                if (!res.ok) {
+                    taskList.innerHTML = '<div class="empty-state"><h2>План не найден 😴</h2><p>У вас пока нет активного плана онбординга</p></div>';
+                    return;
+                }
+
+                const data = await res.json();
+                currentPlanId = data.plan.id;
+
+                taskList.innerHTML = '';
+                let doneCount = 0;
+
+                // Обрабатываем каждый элемент
+                for (let i = 0; i < data.items.length; i++) {
+                    const item = data.items[i];
+                    
+                    // Если статус todo — автоматически меняем на in_progress
+                    if (item.status === 'todo') {
+                        console.log("Авто-обновление для ID:", item.id);
+                        try {
+                            await fetch(`/api/onboarding-items/${item.id}/status`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-User-Id': userId,
+                                    'X-User-Role': localStorage.getItem('user_role')
+                                },
+                                body: JSON.stringify({ status: 'in_progress' })
+                            });
+                            item.status = 'in_progress';
+                        } catch (err) {
+                            console.error('Ошибка авто-обновления:', err);
+                        }
+                    }
+
+                    if (item.status === 'done') doneCount++;
+
+                    // Создаем элемент списка
+                    const li = document.createElement('li');
+                    li.className = `status-${item.status}`;
+                    li.style.animationDelay = `${i * 0.1}s`;
+                    
+                    const isDone = item.status === 'done';
+                    const isProgress = item.status === 'in_progress';
+
+                    li.innerHTML = `
+                        <input type="checkbox" ${isDone ? 'checked' : ''} 
+                               onchange="handleToggle(${item.id}, this.checked)">
+                        <span>${item.title}</span>
+                        <span class="badge ${isDone ? 'badge-done' : (isProgress ? 'badge-progress' : 'badge-todo')}">
+                            ${isDone ? 'Готово' : (isProgress ? 'В работе' : 'Ожидает')}
+                        </span>
+                    `;
+                    
+                    // Добавляем анимацию при изменении статуса
+                    const checkbox = li.querySelector('input[type="checkbox"]');
+                    checkbox.addEventListener('change', function(e) {
+                        if (this.checked) {
+                            li.style.animation = 'pulse 0.3s ease';
+                            setTimeout(() => {
+                                li.style.animation = '';
+                            }, 300);
+                        }
+                    });
+                    
+                    taskList.appendChild(li);
+                }
+
+                // Обновляем прогресс-бар
+                updateProgress(doneCount, data.items.length);
+
+            } catch (err) {
+                console.error("Ошибка:", err);
+                taskList.innerHTML = '<div class="empty-state" style="color: #dc2626;">⚠️ Ошибка загрузки данных</div>';
+            }
+        }
+
+        function updateProgress(doneCount, totalCount) {
+            const percent = Math.round((doneCount / totalCount) * 100);
+            const progressBar = document.getElementById('progress-bar');
+            const percentText = document.getElementById('percent-text');
+            
+            progressBar.style.width = percent + '%';
+            percentText.textContent = percent + '%';
+            
+            // Показываем секцию завершения при 100%
+            const completeSection = document.getElementById('complete-section');
+            if (percent === 100) {
+                completeSection.style.display = 'block';
+                completeSection.style.animation = 'slideUp 0.5s ease-out';
+            } else {
+                completeSection.style.display = 'none';
+            }
+        }
+
+        async function handleToggle(itemId, isChecked) {
+            const newStatus = isChecked ? 'done' : 'in_progress';
+            
+            // Показываем индикатор загрузки на чекбоксе
+            const checkbox = event.target;
+            checkbox.disabled = true;
+            
+            try {
+                await updateStatusOnServer(itemId, newStatus);
+                await loadMyPlan(); // Перерисовываем всё
+            } catch (err) {
+                console.error('Ошибка обновления статуса:', err);
+                checkbox.checked = !isChecked; // Возвращаем обратно
+                alert('Не удалось обновить статус. Попробуйте снова.');
+            } finally {
+                checkbox.disabled = false;
+            }
+        }
+
+        async function updateStatusOnServer(id, status) {
+            const res = await fetch(`/api/onboarding-items/${id}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Id': userId,
+                    'X-User-Role': userRole
+                },
+                body: JSON.stringify({ status: status })
+            });
+            
+            if (!res.ok) {
+                throw new Error('Ошибка сервера');
+            }
+        }
+
+        document.getElementById('finish-btn').onclick = async () => {
+            const btn = document.getElementById('finish-btn');
+            const originalText = btn.textContent;
+            
+            btn.textContent = 'Завершение...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            
+            try {
+                const res = await fetch(`/api/onboarding-plans/${currentPlanId}/complete`, {
+                    method: 'POST',
+                    headers: { 
+                        'X-User-Id': userId, 
+                        'X-User-Role': userRole,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (res.ok) {
+                    btn.style.background = 'linear-gradient(135deg, var(--success), var(--success-dark))';
+                    btn.textContent = '✓ Поздравляем!';
+                    
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    throw new Error('Ошибка завершения');
+                }
+            } catch (err) {
+                console.error('Ошибка:', err);
+                btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                btn.textContent = '✗ Ошибка';
+                
+                setTimeout(() => {
+                    btn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }, 2000);
+            }
+        };
+
+        // Делаем функцию глобальной для onclick
+        window.handleToggle = handleToggle;
+
+        // Запуск при загрузке
+        loadMyPlan();
+    </script>
+</body>
+</html>

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онбординг сотрудников — Управление планами</title>
+    <meta name="description" content="Панель управления планами онбординга.">
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f0fa 100%);
+            color: #1a365d;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        /* Header styles */
+        #main-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 120, 255, 0.1);
+            padding: 16px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+            margin: -20px -20px 20px -20px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 
+                0 20px 40px -10px rgba(0, 100, 200, 0.2),
+                0 0 0 1px rgba(0, 120, 255, 0.1) inset;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+
+        section:hover {
+            box-shadow: 
+                0 30px 50px -15px rgba(0, 100, 255, 0.3),
+                0 0 0 2px rgba(0, 150, 255, 0.2) inset;
+        }
+
+        h3 {
+            color: #1a365d;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            border-radius: 2px;
+            animation: expandWidth 0.5s ease-out;
+        }
+
+        h4 {
+            color: #2c5282;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 20px 0 16px;
+        }
+
+        @keyframes expandWidth {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+            to {
+                width: 60px;
+                opacity: 1;
+            }
+        }
+
+        label {
+            display: block;
+            color: #2c5282;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        select {
+            width: 100%;
+            max-width: 400px;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: white;
+            color: #0f172a;
+            margin-bottom: 16px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        #materials-checkboxes {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 16px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #materials-checkboxes label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        #materials-checkboxes label:hover {
+            background: #e2e8f0;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #2563eb;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: white;
+            color: #0f172a;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -8px rgba(37, 99, 235, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        button:active::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        #plans-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .plan-card {
+            background: white;
+            border: 1px solid rgba(0, 120, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -8px rgba(37, 99, 235, 0.3);
+            border-color: #3b82f6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .plan-card strong {
+            color: #1a365d;
+            font-size: 16px;
+        }
+
+        .plan-card button {
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-left: 16px;
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+        }
+
+        .plan-card button:hover {
+            box-shadow: 0 10px 20px -8px rgba(100, 116, 139, 0.4);
+        }
+
+        .item-row {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 12px;
+            align-items: center;
+            animation: fadeInRow 0.3s ease-out;
+        }
+
+        @keyframes fadeInRow {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .item-row select {
+            width: 140px;
+            padding: 10px;
+            margin: 0;
+            font-size: 14px;
+            background-position: right 12px center;
+        }
+
+        .item-row input[type="text"] {
+            width: 200px;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .item-row button {
+            padding: 10px 20px;
+            margin: 0;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        #details-* {
+            margin-top: 16px;
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            font-size: 16px;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 12px;
+        }
+
+        .status-todo { background: #f1f5f9; color: #475569; }
+        .status-progress { background: #dbeafe; color: #1e40af; }
+        .status-done { background: #dcfce7; color: #166534; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            #main-header {
+                margin: -10px -10px 20px -10px;
+            }
+            
+            section {
+                padding: 20px;
+            }
+            
+            .item-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .item-row select,
+            .item-row input[type="text"],
+            .item-row button {
+                width: 100%;
+            }
+            
+            .plan-card button {
+                display: block;
+                margin: 16px 0 0;
+                width: 100%;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 5px;
+            transition: background 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-header"></div>
+    <script src="/header.js"></script>
+
+    <main>
+        <section id="create-plan-section">
+            <h3>Создать новый план</h3>
+            <label for="employee-select">Сотрудник:</label>
+            <select id="employee-select"></select>
+            
+            <label for="mentor-select">Ментор:</label>
+            <select id="mentor-select"></select>
+            
+            <h4>Выберите материалы:</h4>
+            <div id="materials-checkboxes"></div>
+            <button id="save-plan-btn">Создать план онбординга</button>
+        </section>
+<div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; background: #f1f5f9; padding: 15px; border-radius: 16px;">
+    <div style="flex: 1; min-width: 200px;">
+        <label>Фильтр по сотруднику:</label>
+        <select id="filter-employee" onchange="loadPlans()" style="max-width: 100%; margin-bottom: 0; padding: 10px;">
+            <option value="all">Все сотрудники</option>
+        </select>
+    </div>
+    <div style="flex: 1; min-width: 200px;">
+        <label>Фильтр по статусу:</label>
+        <select id="filter-status" onchange="loadPlans()" style="max-width: 100%; margin-bottom: 0; padding: 10px;">
+            <option value="all">Все статусы</option>
+            <option value="todo">Ожидает</option>
+            <option value="in_progress">В процессе</option>
+            <option value="done">Завершен</option>
+        </select>
+    </div>
+</div>
+        <section>
+            <h3>Все планы и прогресс</h3>
+            <div id="plans-list"></div>
+        </section>
+    </main>
+
+<script>
+    
+        // Данные текущего пользователя из сессии
+        const currentUserId = localStorage.getItem('user_id');
+        const currentUserRole = localStorage.getItem('user_role');
+
+let users = [];
+let materials = [];
+let plans = []; // Добавь эту строку, чтобы все функции видели список планов
+
+        async function init() {
+            
+if (!currentUserId) {
+        window.location.href = '/login.html';
+        return;
+    }
+
+    // СКРЫВАЕМ СОЗДАНИЕ ПЛАНА ДЛЯ ВСЕХ, КРОМЕ ADMIN
+    const createSection = document.getElementById('create-plan-section');
+    if (currentUserRole !== 'admin') {
+        createSection.style.display = 'none';
+    }
+
+            try {
+                // Загрузка пользователей
+                const uRes = await fetch('/api/users');
+                users = await uRes.json();
+                
+                const empSelect = document.getElementById('employee-select');
+                const mentorSelect = document.getElementById('mentor-select');
+
+                users.forEach(u => {
+                    const opt = `<option value="${u.id}">${u.name} (${u.role})</option>`;
+                    if(u.role === 'employee') empSelect.innerHTML += opt;
+                    else mentorSelect.innerHTML += opt;
+                });
+
+                // Загрузка материалов
+                const mRes = await fetch('/api/materials');
+                materials = await mRes.json();
+                
+                const mContainer = document.getElementById('materials-checkboxes');
+                if (materials.length === 0) {
+                    mContainer.innerHTML = '<p>Нет доступных материалов</p>';
+                } else {
+                    mContainer.innerHTML = materials.map(m => `
+                        <label>
+                            <input type="checkbox" name="material" value="${m.id}"> 
+                            <span>${m.title}</span>
+                        </label>
+                    `).join('');
+                }
+                
+                await loadPlans();
+            } catch (err) {
+                console.error('Ошибка инициализации:', err);
+            }
+            // Внутри init() после заполнения empSelect:
+const filterEmp = document.getElementById('filter-employee');
+users.filter(u => u.role === 'employee').forEach(u => {
+    filterEmp.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+});
+        }
+
+      async function loadPlans() {
+    const list = document.getElementById('plans-list');
+    const filterStatus = document.getElementById('filter-status')?.value || 'all';
+    const filterEmp = document.getElementById('filter-employee')?.value || 'all';
+
+    try {
+        const res = await fetch('/api/onboarding-plans', {
+            headers: {
+                'X-User-Id': currentUserId,
+                'X-User-Role': currentUserRole
+            }
+        });
+        
+        // ВАЖНО: Загружаем данные в глобальный массив ОДИН РАЗ
+        const data = await res.json();
+        if (Array.isArray(data)) {
+            plans = data; 
+            console.log("ДАННЫЕ С СЕРВЕРА:");
+console.table(plans.map(p => ({id: p.id, status: p.status})));
+        } else {
+            plans = [];
+        }
+
+        console.log("Загружено планов:", plans.length);
+
+        // Создаем копию для фильтрации, чтобы не портить оригинал
+        let displayPlans = [...plans];
+
+        // 1. Фильтр по ролям (принудительный)
+        // Используем == (не строгое), так как в localStorage строка, а в базе число
+        if (currentUserRole === 'mentor') {
+            displayPlans = displayPlans.filter(p => p.mentor_id == currentUserId);
+        } else if (currentUserRole === 'employee') {
+            displayPlans = displayPlans.filter(p => p.employee_id == currentUserId);
+        }
+
+        // 2. Фильтр по выбранному статусу
+        if (filterStatus !== 'all') {
+            displayPlans = displayPlans.filter(p => p.status === filterStatus);
+        }
+
+        // 3. Фильтр по конкретному сотруднику
+        if (filterEmp !== 'all') {
+            displayPlans = displayPlans.filter(p => p.employee_id == filterEmp);
+        }
+
+        console.log("Отображено после фильтров:", displayPlans.length);
+
+        if (displayPlans.length === 0) {
+            list.innerHTML = '<p class="empty-state">Нет планов, соответствующих фильтрам.</p>';
+            return;
+        }
+
+        list.innerHTML = displayPlans.map(p => {
+            const employee = users.find(u => u.id == p.employee_id); // Тоже используй ==
+           const statusClass = p.status === 'done' ? 'status-done' : (p.status === 'in_progress' ? 'status-progress' : 'status-todo');
+const statusText = p.status === 'done' ? '✓ Завершен' : (p.status === 'in_progress' ? '⟳ В процессе' : '○ Ожидает');
+
+            return `
+                <div class="plan-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>План №${p.id}</strong> — 
+                            <span>${employee ? employee.name : 'Сотрудник #' + p.employee_id}</span>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <button onclick="toggleDetails(${p.id})" class="toggle-btn">Управлять этапами</button>
+                    </div>
+                    <div id="details-${p.id}" style="display:none; margin-top:16px;"></div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error('Ошибка загрузки:', err);
+        list.innerHTML = '<p class="empty-state" style="color:red">Ошибка соединения с сервером</p>';
+    }
+}
+async function toggleDetails(planId) {
+    const div = document.getElementById(`details-${planId}`);
+    const btn = div.previousElementSibling.querySelector('.toggle-btn');
+    
+    if (div.style.display === 'block') { 
+        div.style.display = 'none';
+        btn.textContent = 'Управлять этапами';
+        return;
+    }
+    
+    // Находим план в глобальном массиве
+    const currentPlan = plans.find(p => p.id === planId);
+    if (!currentPlan) {
+        console.error("План не найден в локальном списке");
+        return;
+    }
+
+    btn.textContent = 'Загрузка...';
+    
+    try {
+        const res = await fetch(`/api/onboarding-plans/${planId}/items`, {
+            headers: { 'X-User-Id': currentUserId, 'X-User-Role': currentUserRole }
+        });
+        const items = await res.json();
+        
+        div.style.display = 'block';
+        div.innerHTML = items.map(item => {
+            // Исправлено: сверяем ID сотрудника из объекта плана
+            const isOwner = (currentUserRole === 'employee' && currentPlan.employee_id == currentUserId);
+            const canEdit = (currentUserRole === 'admin' || currentUserRole === 'mentor' || isOwner);
+
+            return `
+            <div class="item-row">
+                <span style="font-weight: 500;">${item.title}</span>
+                <select id="status-${item.id}" ${!canEdit ? 'disabled' : ''}>
+                    <option value="todo" ${item.status==='todo'?'selected':''}>Ожидает</option>
+                    <option value="in_progress" ${item.status==='in_progress'?'selected':''}>В работе</option>
+                    <option value="done" ${item.status==='done'?'selected':''}>Завершено</option>
+                </select>
+                <input type="text" id="comment-${item.id}" value="${item.comment || ''}" 
+                       placeholder="Коммент..." ${!canEdit ? 'disabled' : ''}>
+                ${canEdit ? `<button onclick="saveItem(${item.id}, ${planId})">ОК</button>` : ''}
+            </div>
+            `;
+        }).join('');
+        btn.textContent = 'Скрыть';
+    } catch (err) {
+        console.error(err);
+        btn.textContent = 'Ошибка';
+    }
+}
+        document.getElementById('save-plan-btn').onclick = async () => {
+            const employeeId = document.getElementById('employee-select').value;
+            const mentorId = document.getElementById('mentor-select').value;
+            const materialIds = Array.from(document.querySelectorAll('input[name="material"]:checked')).map(cb => parseInt(cb.value));
+
+            if (materialIds.length === 0) return alert("Выберите материалы");
+
+            try {
+                const res = await fetch('/api/onboarding-plans', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-User-Id': currentUserId, 'X-User-Role': currentUserRole },
+                    body: JSON.stringify({ employee_id: parseInt(employeeId), mentor_id: parseInt(mentorId), material_ids: materialIds })
+                });
+
+                if (res.ok) {
+                    alert("План создан!");
+                    window.location.reload();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+async function saveItem(itemId, planId) {
+    const statusEl = document.getElementById(`status-${itemId}`);
+    const commentEl = document.getElementById(`comment-${itemId}`);
+    
+    const newStatus = statusEl.value;
+    const newComment = commentEl.value;
+    
+    // Берем кнопку через event (важно для работы внутри onclick)
+    const btn = event.target; 
+    const originalText = btn.textContent;
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    try {
+        // 1. ОПРЕДЕЛЯЕМ res здесь
+        const res = await fetch(`/api/onboarding-plans/${planId}/items/${itemId}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-User-Id': currentUserId, 
+                'X-User-Role': currentUserRole 
+            },
+            body: JSON.stringify({
+                status: newStatus,
+                comment: newComment
+            })
+        });
+
+        // 2. ТЕПЕРЬ проверяем res.ok
+        if (res.ok) {
+            btn.textContent = '✓';
+            btn.style.background = '#166534';
+            
+            // Обновляем данные на странице, чтобы фильтры увидели новый статус
+            await loadPlans(); 
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 2000);
+        } else {
+            throw new Error('Ошибка сервера');
+        }
+    } catch (err) {
+        console.error('Ошибка сохранения:', err);
+        btn.textContent = 'Ошибка';
+        btn.style.background = '#dc2626';
+        setTimeout(() => { 
+            btn.textContent = originalText; 
+            btn.disabled = false; 
+            btn.style.background = '';
+        }, 2000);
+    }
+}
+        window.toggleDetails = toggleDetails;
+        window.saveItem = saveItem;
+        init();
+    </script>
+</body>
+</html>

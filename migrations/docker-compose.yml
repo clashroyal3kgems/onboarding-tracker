@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: onboarding-db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: onboarding
+    volumes:
+      # ВНИМАНИЕ: Здесь путь к твоему реальному файлу миграции
+      - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: onboarding-app
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://user:password@onboarding-db:5432/onboarding?sslmode=disable
